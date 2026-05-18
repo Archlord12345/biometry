@@ -30,11 +30,6 @@ export default function LockScreen({ onUnlock }) {
       }
     };
     init();
-
-    if (required === 0) {
-      console.log('Aucune secousse requise pour aujourd\'hui. Déverrouillage automatique.');
-      onUnlock();
-    }
     
     return () => stopShakeDetection();
   }, []);
@@ -49,6 +44,11 @@ export default function LockScreen({ onUnlock }) {
   };
 
   const toggleShake = () => {
+    if (required === 0) {
+      console.log('Aucune secousse requise pour aujourd\'hui. Déverrouillage automatique lors de l\'appui.');
+      onUnlock();
+      return;
+    }
     if (shakeOn) {
       stopShakeDetection(); setShakeOn(false); setCount(0); countRef.current = 0;
     } else {

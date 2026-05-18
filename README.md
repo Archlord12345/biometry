@@ -40,8 +40,8 @@ Méthodes de déverrouillage disponibles :
 
 #### 📐 Logique des secousses journalières
 Le nombre de secousses requises change chaque jour pour renforcer la sécurité par "code changeant" :
-- **Formule** : `(jour_de_la_semaine² % 5)`, si le résultat est 0, on utilise 5.
-- **Exemple** : Lundi (1) = 1 secousse, Mardi (2) = 4 secousses, Vendredi (5) = 5 secousses.
+- **Formule** : `(jour_de_la_semaine² % 5)`. Si le résultat est `0` (comme le vendredi), l'appareil se déverrouille instantanément par un simple appui sur le bouton **Secousses** (aucune secousse physique requise).
+- **Exemple** : Lundi (1) = 1 secousse, Mardi (2) = 4 secousses, Vendredi (5) = 0 secousse (déverrouillage au clic sur le bouton).
 
 ### 🏠 Tableau de bord (HomeScreen)
 Une interface de gestion pour tester les capteurs :
