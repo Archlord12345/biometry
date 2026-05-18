@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="src/assets/logo.png" width="120" height="120" alt="BiometryLock Logo" />
+</p>
+
 # BiometryLock
 
 Application React Native de démonstration combinant **biométrie**, **caméra** et **détection de secousses**. Elle se présente comme un écran de verrouillage personnalisé avec des méthodes de déverrouillage sécurisées et un tableau de bord de test.
