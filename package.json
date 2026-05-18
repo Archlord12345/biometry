@@ -7,7 +7,10 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "build:apk": "cd android && ./gradlew assembleRelease",
+    "build:apk:debug": "cd android && ./gradlew assembleDebug",
+    "clean:android": "cd android && ./gradlew clean"
   },
   "dependencies": {
     "@react-native/new-app-screen": "0.85.2",

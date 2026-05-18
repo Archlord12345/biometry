@@ -8,7 +8,7 @@ export default function LockScreen({ onUnlock }) {
   const required = getRequiredShakes();
   const [count, setCount]         = useState(0);
   const [shakeOn, setShakeOn]     = useState(false);
-  const [biometricLabel, setBiometricLabel] = useState('Biométrie');
+  const [biometrics, setBiometrics] = useState({ faceId: false, touchId: false, generic: false });
   const countRef                  = useRef(0);
 
   useEffect(() => {
@@ -19,13 +19,11 @@ export default function LockScreen({ onUnlock }) {
         console.log('Biométrie disponible:', available, 'Type:', type);
         
         if (available) {
-          if (type === 'FaceID') setBiometricLabel('FaceID');
-          else if (type === 'TouchID') setBiometricLabel('TouchID');
-          else if (type === 'Biometrics') setBiometricLabel('Empreinte digitale');
-          else setBiometricLabel('Biométrie');
-        } else {
-          console.log('Aucune biométrie disponible sur cet appareil.');
-          setBiometricLabel('Biométrie (indisponible)');
+          setBiometrics({
+            faceId: type === 'FaceID',
+            touchId: type === 'TouchID' || type === 'Biometrics',
+            generic: type !== 'FaceID' && type !== 'TouchID' && type !== 'Biometrics'
+          });
         }
       } catch (error) {
         console.error('Erreur lors de l\'initialisation biométrique:', error);
@@ -41,12 +39,11 @@ export default function LockScreen({ onUnlock }) {
     return () => stopShakeDetection();
   }, []);
 
-  const biometricUnlock = async () => {
-    const { success } = await authenticate(`Déverrouiller avec ${biometricLabel}`);
+  const biometricUnlock = async (typeLabel) => {
+    const { success } = await authenticate(`Déverrouiller avec ${typeLabel}`);
     if (success) {
       onUnlock();
     } else {
-      // Si l'utilisateur annule, on ne fait rien de spécial
       console.log('Authentification annulée ou échouée');
     }
   };
@@ -64,14 +61,6 @@ export default function LockScreen({ onUnlock }) {
     }
   };
 
-  const getBiometricIcon = () => {
-    if (biometricLabel === 'FaceID') return '🎭';
-    if (biometricLabel === 'TouchID' || biometricLabel === 'Empreinte digitale') return '👆';
-    return '🔐';
-  };
-
-  const isFaceId = biometricLabel === 'FaceID';
-
   return (
     <View style={s.root}>
       <StatusBar barStyle="light-content" backgroundColor="#0d0d1a" />
@@ -79,13 +68,25 @@ export default function LockScreen({ onUnlock }) {
       <Text style={s.title}>BiometryLock</Text>
       <Text style={s.sub}>Choisissez votre méthode</Text>
 
+      {/* Bouton Face ID */}
       <TouchableOpacity 
-        style={[s.btnPrimary, isFaceId && s.btnFaceId]} 
-        onPress={biometricUnlock}
+        style={[s.btnPrimary, s.btnFaceId, !biometrics.faceId && s.btnDisabled]} 
+        onPress={() => biometrics.faceId && biometricUnlock('FaceID')}
+        disabled={!biometrics.faceId}
       >
-        <Text style={s.btnText}>{getBiometricIcon()}  {biometricLabel}</Text>
+        <Text style={[s.btnText, !biometrics.faceId && s.btnTextDisabled]}>🎭  Face ID</Text>
       </TouchableOpacity>
 
+      {/* Bouton Empreinte */}
+      <TouchableOpacity 
+        style={[s.btnPrimary, !biometrics.touchId && s.btnDisabled]} 
+        onPress={() => biometrics.touchId && biometricUnlock('Empreinte')}
+        disabled={!biometrics.touchId}
+      >
+        <Text style={[s.btnText, !biometrics.touchId && s.btnTextDisabled]}>👆  Empreinte digitale</Text>
+      </TouchableOpacity>
+
+      {/* Bouton Secousses */}
       <TouchableOpacity style={[s.btnSecondary, shakeOn && s.btnActive]} onPress={toggleShake}>
         <Text style={[s.btnText, !shakeOn && { color: '#aaa' }]}>
           {shakeOn ? `📳  ${count} / ${required} secousses` : `📳  Secousses (${getTodayName()} → ${required})`}
@@ -112,9 +113,11 @@ const s = StyleSheet.create({
   sub:         { color: '#555', fontSize: 13, marginBottom: 36 },
   btnPrimary:  { width: '100%', backgroundColor: '#4f46e5', borderRadius: 16, padding: 18, alignItems: 'center', marginBottom: 14, elevation: 6 },
   btnFaceId:   { backgroundColor: '#007aff' }, // iOS style blue for Face ID
+  btnDisabled: { backgroundColor: '#1e1e2d', elevation: 0, opacity: 0.6 },
   btnSecondary:{ width: '100%', backgroundColor: '#161625', borderRadius: 16, padding: 18, alignItems: 'center', borderWidth: 1, borderColor: '#2a2a3e', marginBottom: 14 },
   btnActive:   { borderColor: '#f97316' },
   btnText:     { color: '#fff', fontSize: 16, fontWeight: '700' },
+  btnTextDisabled: { color: '#555' },
   dots:        { flexDirection: 'row', gap: 10, marginTop: 6 },
   dot:         { width: 14, height: 14, borderRadius: 7, backgroundColor: '#2a2a3e', borderWidth: 1.5, borderColor: '#3a3a5e' },
   dotOn:       { backgroundColor: '#f97316', borderColor: '#f97316' },

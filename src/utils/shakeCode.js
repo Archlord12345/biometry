@@ -1,7 +1,7 @@
 /**
  * Calcule le nombre de secousses requis selon le jour de la semaine.
  * j : Lundi=1, Mardi=2, Mercredi=3, Jeudi=4, Vendredi=5, Samedi=6, Dimanche=7
- * Formule : (j * j) % 5  — minimum 1 pour éviter 0 secousses (cas Vendredi)
+ * Formule : (j * j) % 5
  */
 export function getRequiredShakes() {
   const jsDay = new Date().getDay(); // 0=Dimanche, 1=Lundi … 6=Samedi
